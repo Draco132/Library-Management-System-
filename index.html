@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Library Management System</title>
+<style>
+:root{--bg:#1b1c1e;--card:#1f2022;--tx:#e6e9ee;--hd:#c5d3e0;--mu:#a0a6ae;--bd:#3b3e42;--in:#2c2d30;--pr:#0b3fd1;--gr:#2e9e4f;--grt:#6fdc8c;--grb:#0d2e18;--bad:#f0605a;--wn:#f0b45a;--wb:#35260d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f5f7;--card:#fff;--tx:#1d2230;--hd:#1d3550;--mu:#5d6572;--bd:#d6d9de;--in:#f0f1f3;--grt:#1e7a3a;--grb:#dff3e5;--wb:#fbeed6}}
+:root[data-theme="light"]{--bg:#f4f5f7;--card:#fff;--tx:#1d2230;--hd:#1d3550;--mu:#5d6572;--bd:#d6d9de;--in:#f0f1f3;--grt:#1e7a3a;--grb:#dff3e5;--wb:#fbeed6}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.5 Roboto,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;padding:14px 16px;border-bottom:1px solid var(--bd)}
+.brand{display:flex;align-items:center;gap:10px;flex:1 1 200px}
+.brand svg{flex:none;color:var(--pr)}
+.brand h1{margin:0;font-size:22px;line-height:1.25;color:var(--hd)}
+.hs{display:flex;align-items:center;gap:16px}
+.hs div{font-size:14px;color:var(--mu);text-align:left;line-height:1.3}
+.hs b{display:block;font-size:18px;color:var(--tx);font-weight:500}
+.hs .g,.hs .g b{color:var(--grt)}
+select,input{width:100%;padding:12px 14px;border:1px solid var(--bd);border-radius:8px;background:var(--in);color:var(--tx);font:inherit}
+#lang{width:auto}
+main{max-width:760px;margin:0 auto;padding:22px 16px 40px}
+h2{margin:0;font-size:30px;color:var(--hd)}
+.sub{margin:6px 0 20px;color:var(--tx);font-size:18px}
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:8px;padding:12px 22px;font:inherit;font-weight:500;color:#fff;cursor:pointer}
+.pr{background:var(--pr)}.gr{background:var(--gr)}
+.ol{background:none;border:1px solid var(--bd);color:var(--tx)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-top:22px}
+label{display:block;margin:0 0 8px;font-weight:500}
+.f{margin-bottom:14px}.f:last-child{margin:0}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+h3{margin:0 0 6px;font-size:26px}
+.bk{padding:18px 0;border-top:1px solid var(--bd)}
+.bk:first-of-type{border-top:0}
+.bk h4{margin:0 0 10px;font-size:22px;color:var(--hd);font-weight:500}
+.bd{display:inline-flex;align-items:center;gap:7px;padding:3px 12px;border-radius:14px;font-size:14px;background:var(--grb);color:var(--grt)}
+.bd:before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.bd.b{background:var(--wb);color:var(--wn)}
+.meta{margin:10px 0;color:var(--mu)}
+.acts{display:flex;align-items:center;gap:14px}
+.del{background:none;border:0;color:var(--bad);cursor:pointer;padding:6px}
+.empty{color:var(--mu);padding:16px 0;text-align:center}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}.md{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;width:100%;max-width:380px}.md p{margin:0 0 12px;font-size:18px}.hide{display:none!important}
+</style></head><body>
+<header>
+<div class="brand"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg><h1 data-i="title"></h1></div>
+<div class="hs"><div><b id="tot">0</b><span data-i="total"></span></div><div class="g"><b id="av">0</b><span data-i="avail"></span></div>
+<select id="lang" aria-label="Language"><option value="en">English</option><option value="ta">தமிழ்</option></select></div>
+</header>
+<main>
+<h2 data-i="catalog"></h2>
+<p class="sub" data-i="manage"></p>
+<button class="btn pr" onclick="toggleAdd()"><span>＋</span><span data-i="add"></span></button>
+
+<div class="card hide" id="addc"><form onsubmit="return addBook(event)">
+<div class="f"><label data-i="bid"></label><input name="id" id="nid" readonly style="opacity:.8"></div>
+<div class="f"><label data-i="btitle"></label><input name="title" required></div>
+<div class="f"><label data-i="author"></label><input name="author"></div>
+<div class="row"><button class="btn pr" data-i="save"></button><button type="button" class="btn ol" onclick="toggleAdd()" data-i="cancel"></button></div>
+</form></div>
+
+<div class="card">
+<div class="f"><label data-i="search"></label><input id="q" oninput="list()" data-ph="searchPh"></div>
+<div class="f"><label data-i="filter"></label><select id="st" onchange="list()"><option value="all" data-i="all"></option><option value="a" data-i="availO"></option><option value="b" data-i="borrowedO"></option></select></div>
+</div>
+
+<div class="card"><h3 data-i="coll"></h3><div id="list"></div></div>
+</main>
+<div class="ov hide" id="ov"><div class="md"><p id="mm"></p><input id="mi" class="hide" autocomplete="off"><div class="row"><button class="btn pr" id="mok"></button><button class="btn ol" id="mc"></button></div></div></div>
+<script>
+var T={en:{title:"Library Management System",total:"Total Books",avail:"Available",catalog:"Book Catalog",manage:"Manage your library collection",add:"Add Book",bid:"Book ID (auto-assigned)",btitle:"Title",author:"Author",save:"Save",cancel:"Cancel",search:"Search Books",searchPh:"Search by book title...",filter:"Filter by Status",all:"All Books",availO:"Available",borrowedO:"Borrowed",coll:"Your Collection",bsec:"Borrowed Books",noneB:"No borrowed books",ok:"OK",id:"Book ID",borrow:"Borrow",ret:"Return",by:"Borrowed by",due:"Due",none:"No books found",ask:"Borrower name?",full:"All Book IDs (1-999) are used.",conf:"Delete this book?"},
+ta:{title:"நூலக மேலாண்மை அமைப்பு",total:"மொத்த புத்தகங்கள்",avail:"கிடைக்கும்",catalog:"புத்தக பட்டியல்",manage:"உங்கள் நூலக சேகரிப்பை நிர்வகிக்கவும்",add:"புத்தகம் சேர்",bid:"புத்தக எண் (தானாக வழங்கப்படும்)",btitle:"தலைப்பு",author:"ஆசிரியர்",save:"சேமி",cancel:"ரத்து",search:"புத்தகங்களைத் தேடு",searchPh:"புத்தகத் தலைப்பால் தேடு...",filter:"நிலையால் வடிகட்டு",all:"அனைத்து புத்தகங்கள்",availO:"கிடைக்கும்",borrowedO:"எடுக்கப்பட்டது",coll:"உங்கள் சேகரிப்பு",bsec:"எடுக்கப்பட்ட புத்தகங்கள்",noneB:"எடுக்கப்பட்ட புத்தகங்கள் இல்லை",ok:"சரி",id:"புத்தக எண்",borrow:"எடு",ret:"திருப்பு",by:"எடுத்தவர்",due:"திரும்ப வேண்டிய நாள்",none:"புத்தகங்கள் இல்லை",ask:"எடுப்பவரின் பெயர்?",full:"அனைத்து புத்தக எண்களும் (1-999) பயன்படுத்தப்பட்டுவிட்டன.",conf:"இந்த புத்தகத்தை நீக்கவா?"}};
+var lang="en",books=[];function $(i){return document.getElementById(i)}
+function t(k){return T[lang][k]}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function save(){try{localStorage.setItem("lms_v2",JSON.stringify({books:books,lang:lang}))}catch(e){}}
+function load(){try{var r=localStorage.getItem("lms_v2");if(r){var d=JSON.parse(r);books=d.books||[];lang=d.lang||"en";return}
+var o=localStorage.getItem("lms_v1");if(o){var d1=JSON.parse(o);books=d1.books.map(function(b){var l=d1.loans.filter(function(x){return x.bookId===b.id&&!x.returned})[0],m=l&&d1.members.filter(function(x){return x.id===l.memberId})[0];return{id:b.id,title:b.title,author:b.author,by:l?(m?m.name:"?"):"",due:l?l.due:""}});return}}catch(e){}
+books=[{id:1,title:"The Alchemist",author:"Paulo Coelho"},{id:2,title:"Wings of Fire",author:"A.P.J. Abdul Kalam"},{id:3,title:"Clean Code",author:"Robert C. Martin"}]}
+function applyLang(){document.documentElement.lang=lang;document.getElementById("lang").value=lang;
+document.querySelectorAll("[data-i]").forEach(function(e){e.textContent=t(e.dataset.i)});
+document.querySelectorAll("[data-ph]").forEach(function(e){e.placeholder=t(e.dataset.ph)});list()}
+function card(b){return'<div class="bk"><h4>'+esc(b.title)+'</h4><span class="bd'+(b.by?' b':'')+'">'+(b.by?t("borrowedO"):t("availO"))+'</span><div class="meta">'+t("id")+': '+b.id+(b.author?' · '+esc(b.author):'')+(b.by?'<br>'+t("by")+': <b>'+esc(b.by)+'</b> · '+t("due")+': '+b.due:'')+'</div><div class="acts">'+(b.by?'<button class="btn ol" onclick="ret('+b.id+')">↩ '+t("ret")+'</button>':'<button class="btn gr" onclick="borrow('+b.id+')">✋ '+t("borrow")+'</button>')+'<button class="del" aria-label="Delete" onclick="del('+b.id+')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></button></div></div>'}
+function list(){var q=$("q").value.toLowerCase(),s=$("st").value;
+$("tot").textContent=books.length;
+$("av").textContent=books.filter(function(b){return!b.by}).length;
+var r=books.filter(function(b){return(b.id+" "+b.title+" "+(b.author||"")).toLowerCase().indexOf(q)>-1&&(s==="all"||(s==="a"&&!b.by)||(s==="b"&&b.by))});
+$("list").innerHTML=r.length?r.map(card).join(""):'<div class="empty">'+t("none")+'</div>';}
+var cb=null;
+function dlg(msg,inp,ok,cancel){$("mm").textContent=msg;var i=$("mi");i.value="";i.classList.toggle("hide",!inp);$("mok").textContent=t("ok");$("mc").textContent=t("cancel");$("mc").classList.toggle("hide",!cancel);$("ov").classList.remove("hide");if(inp)i.focus();cb=ok}
+$("mok").onclick=function(){var v=$("mi").value.trim();if(!$("mi").classList.contains("hide")&&!v){$("mi").focus();return}$("ov").classList.add("hide");var f=cb;cb=null;if(f)f(v)};
+$("mc").onclick=function(){$("ov").classList.add("hide");cb=null};
+$("mi").onkeydown=function(e){if(e.key==="Enter")$("mok").click()};
+function get(id){return books.filter(function(b){return b.id===id})[0]}
+function nextId(){for(var i=1;i<=999;i++)if(!get(i))return i;return 0}
+function toggleAdd(){var c=document.getElementById("addc");c.classList.toggle("hide");document.getElementById("nid").value=nextId()||""}
+function addBook(e){e.preventDefault();var f=e.target,id=nextId();
+if(!id){dlg(t("full"),false,null,false);return false}
+books.push({id:id,title:f.title.value.trim(),author:f.author.value.trim(),by:"",due:""});
+f.reset();toggleAdd();save();list();return false}
+function borrow(id){dlg(t("ask"),true,function(n){var d=new Date();d.setDate(d.getDate()+14);var b=get(id);b.by=n;b.due=d.toISOString().slice(0,10);save();list()},true)}
+function ret(id){var b=get(id);b.by="";b.due="";save();list()}
+function del(id){dlg(t("conf"),false,function(){books=books.filter(function(b){return b.id!==id});save();list()},true)}
+document.getElementById("lang").onchange=function(){lang=this.value;save();applyLang()};
+load();applyLang();
+</script></body></html>
